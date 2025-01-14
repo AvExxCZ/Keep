@@ -25,7 +25,7 @@ app.use(express.json())
 const cors = require("cors")
 app.use(cors({
   origin: 'http://localhost:5173', // Povolí požadavky z tohoto originu
-  methods: ['GET', 'POST'], // Můžeš specifikovat i metody
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Můžeš specifikovat i metody
   allowedHeaders: ['Content-Type', 'Authorization'], // Povolené hlavičky
 }));
 

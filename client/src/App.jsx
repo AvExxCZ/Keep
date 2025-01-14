@@ -1,66 +1,107 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import useDebounce from "./utils/UseDebounce";
 
 const App = () => {
+  const [notes, setNotes] = useState([]);
 
-  const [notes, setNotes] = useState([])
+  // Fetch notes při načtení aplikace
+  useEffect(() => {
+    const fetchNotes = async () => {
+      const response = await fetch("http://localhost:6060/api/notes/get");
+      const data = await response.json();
+      setNotes(data.data);
+    };
+    fetchNotes();
+  }, []);
 
-  const [noteContent, setNoteContent] = useState([])
+  // Aktualizace poznámek lokálně (pouze v paměti)
+  const updateNoteLocally = (id, key, value) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note._id === id ? { ...note, [key]: value } : note
+      )
+    );
+  };
+
+  // Funkce pro zápis do databáze
+  const updateNoteInDB = async (id, updatedData) => {
+    try {
+      const response = await fetch(`http://localhost:6060/api/notes/update/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error("Error from server:", result.message);
+      } else {
+        console.log("Note successfully updated in DB:", result.message);
+      }
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
+  };
+
+  const deleteNote = async (id) => {
+    try {
+      await fetch(`http://localhost:6060/api/notes/delete/${id}`, {
+        method: "DELETE",
+      });
+      console.log(`Note with id "${id}" successfully deleted.`)
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
+  }
   
 
-  useEffect(function(){
-    const fetchNotes = async () => {
-      const response = await fetch("http://localhost:6060/api/notes/get")
-      const data = await response.json()
-      setNotes(data.data)
-    }
-
-    fetchNotes()
-  }, [])
-
-  async function handleDelete(id){
-
-  }
-
-
-  // const NoteForm = function(){
-  //   const [formData, setFormData] = useState({title: "", content: ""})
-  // }
+  // Funkce pro debounce zápisu do databáze
+  const debouncedUpdate = useDebounce(updateNoteInDB, 1000); // 1 sekunda zpoždění
 
   return (
     <div>
-      <form>
-        <input type="text" placeholder="Title" />
-        <input type="text" placeholder="Content" />
-        <button type="submit">Submit</button>
-      </form>
       <div className="w-screen flex flex-col gap-10">
-        {
-          notes.map(function(note, index){
+        {notes.map((note) => (
+          <div key={note._id} className="p-5 w-full bg-gray-100">
+            {/* Input pro title */}
+            <input
+              type="text"
+              value={note.title}
+              className="text-2xl w-full h-fit"
+              onChange={(e) => {
+                updateNoteLocally(note._id, "title", e.target.value);
+                debouncedUpdate(note._id, { title: e.target.value });
+              }}
+            />
+            {/* Note ID */}
+            <h1 className="text-2xl">{note._id}</h1>
+            {/* Textarea pro content */}
+            <textarea
+              value={note.content}
+              className="w-full h-fit"
+              onChange={(e) => {
+                updateNoteLocally(note._id, "content", e.target.value);
+                debouncedUpdate(note._id, { content: e.target.value });
+              }}
+            />
+            {/* Tags */}
+            <p>
+              {note.tags.map((tag, index) => (
+                <span key={index} className="p-5">
+                  {tag}
+                </span>
+              ))}
+            </p>
 
-            return (
-              <div key={index} className="p-5 w-full bg-gray-100" >
-                <h1 className="text-2xl">{note.title}</h1>
-                <h1 className="text-2xl">{note._id}</h1>
-                <input type="textarea" value={note.content} className="w-full h-fit" />
-                <p>
-                {
-                  note.tags.map(function(tag, index){
-                    return <span key={index} className="p-5">{tag}</span>
-                  })
-                }
-                </p>
-                <p>{note.color}</p>
-                <p>{note.pin ? "true" : "false"}</p>
-                <button onClick={
-                  () => handleDelete(note._id)
-                } >Delete</button>
-              </div>
-            )
-          })
-        }
+            <button 
+              className="p-2 bg-red-500 text-white font-bold rounded-md"
+              onClick={ () => deleteNote(note._id) }
+            >DELETE</button>
+          </div>
+        ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
