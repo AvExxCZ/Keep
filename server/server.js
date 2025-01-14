@@ -5,6 +5,9 @@ require("dotenv").config()
 const express = require("express")
 const connectDB = require("./database/db")
 
+
+
+
 // import modelu/struktury Note v databázi
 const Note = require("./models/Note")
 
@@ -17,6 +20,14 @@ connectDB()
 
 // json middleware
 app.use(express.json())
+
+// idk co to je 
+const cors = require("cors")
+app.use(cors({
+  origin: 'http://localhost:5173', // Povolí požadavky z tohoto originu
+  methods: ['GET', 'POST'], // Můžeš specifikovat i metody
+  allowedHeaders: ['Content-Type', 'Authorization'], // Povolené hlavičky
+}));
 
 // vytvoření express routeru
 const router = express.Router()
