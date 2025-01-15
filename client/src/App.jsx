@@ -56,29 +56,29 @@ const App = () => {
   
 
   // Funkce pro debounce zápisu do databáze
-  const debouncedUpdate = useDebounce(updateNoteInDB, 1000); // 1 sekunda zpoždění
+  const debouncedUpdate = useDebounce(updateNoteInDB, 1000);
 
   return (
     <div>
+      <h1 className="text-4xl text-white">Poznámky</h1>
       <div className="w-screen flex flex-col gap-10">
         {notes.map((note) => (
-          <div key={note._id} className="p-5 w-full bg-gray-100">
+          <div key={note._id} className="p-5 w-full bg-[#202020]">
             {/* Input pro title */}
             <input
               type="text"
               value={note.title}
-              className="text-2xl w-full h-fit"
+              className="text-2xl w-full h-fit bg-transparent text-white"
               onChange={(e) => {
                 updateNoteLocally(note._id, "title", e.target.value);
                 debouncedUpdate(note._id, { title: e.target.value });
               }}
             />
             {/* Note ID */}
-            <h1 className="text-2xl">{note._id}</h1>
             {/* Textarea pro content */}
             <textarea
               value={note.content}
-              className="w-full h-fit"
+              className="input"
               onChange={(e) => {
                 updateNoteLocally(note._id, "content", e.target.value);
                 debouncedUpdate(note._id, { content: e.target.value });
@@ -97,6 +97,7 @@ const App = () => {
               className="p-2 bg-red-500 text-white font-bold rounded-md"
               onClick={ () => deleteNote(note._id) }
             >DELETE</button>
+            <h1 className="text-2xl">{note._id}</h1>
           </div>
         ))}
       </div>

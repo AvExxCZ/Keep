@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body{
+    background: #232323;
+}
+.input {
+    outline: none;
+    border: 1px solid black;
+    background: #202020;
+    color: rgb(240, 240, 240);
+    resize: none;
+    overflow-x: hidden; /* Skryje horizontální scroll */
+    overflow-y: auto; /* Povolený vertikální scroll */
+    min-height: 200px;
+    height: auto;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+/* Scrollbar dráha */
+.input::-webkit-scrollbar {
+    width: 8px; /* Šířka scroll baru */
+}
+
+.input::-webkit-scrollbar-track {
+    background: #2a2a2a; /* Barva dráhy scroll baru */
+    border-radius: 10px; /* Zaoblení dráhy */
+}
+
+/* Scrollbar posuvník */
+.input::-webkit-scrollbar-thumb {
+    background: orange; /* Barva posuvníku */
+    border-radius: 10px; /* Zaoblení posuvníku */
+    border: 2px solid #202020; /* Odstup od dráhy */
+}
+
+/* Hover efekt na posuvníku */
+.input::-webkit-scrollbar-thumb:hover {
+    background: #ff9c00; /* Změna barvy při najetí myší */
+}
